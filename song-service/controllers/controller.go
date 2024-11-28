@@ -37,6 +37,16 @@ func GetSongs(c *gin.Context) {
 	limit := c.DefaultQuery("limit", "10")
 	offset := c.DefaultQuery("offset", "0")
 
+	var idInt int
+
+	if id != "" {
+		temp, err := strconv.Atoi(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		idInt = temp
+	}
 	//Need bigint for postgres
 	limitInt, err := strconv.Atoi(limit)
 	if err != nil || limitInt < 1 {
@@ -47,13 +57,30 @@ func GetSongs(c *gin.Context) {
 		offsetInt = 0
 	}
 
-	rows, err := db.DB.Query(`
+	query := `
         SELECT id, group_name, song_name, release_date, text, link 
         FROM songs 
         WHERE (group_name ILIKE $1 OR $1 = '') AND (song_name ILIKE $2 OR $2 = '') 
-		AND (release_date ILIKE $3 OR $3 = '') AND (text ILIKE $4 OR $4 = '') AND (link ILIKE $5 OR $5 = '') AND (id ILIKE $6 OR $6 = '')
-        LIMIT $7 OFFSET $8
-    `, "%"+group+"%", "%"+title+"%", "%"+realiseDate+"%", "%"+text+"%", "%"+link+"%", "%"+id+"%", limitInt, offsetInt)
+		AND (release_date ILIKE $3 OR $3 = '') AND (text ILIKE $4 OR $4 = '') AND (link ILIKE $5 OR $5 = '')
+    `
+
+	args := []interface{}{
+		"%" + group + "%",
+		"%" + title + "%",
+		"%" + realiseDate + "%",
+		"%" + text + "%",
+		"%" + link + "%",
+	}
+
+	if id != "" {
+		query += " AND id = $6 LIMIT $7 OFFSET $8"
+		args = append(args, idInt)
+	} else {
+		query += " LIMIT $6 OFFSET $7"
+	}
+
+	args = append(args, limitInt, offsetInt)
+	rows, err := db.DB.Query(query, args...)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
