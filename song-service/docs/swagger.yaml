@@ -1,0 +1,228 @@
+basePath: /api/v1
+definitions:
+  models.Required:
+    properties:
+      group:
+        type: string
+      link:
+        type: string
+      releaseDate:
+        type: string
+      song:
+        type: string
+      text:
+        type: string
+    required:
+    - group
+    - song
+    type: object
+  models.Song:
+    description: Song model definition
+    properties:
+      group:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      releaseDate:
+        type: string
+      song:
+        type: string
+      text:
+        type: string
+    required:
+    - group
+    - song
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /songs:
+    post:
+      consumes:
+      - application/json
+      description: Add a new song
+      parameters:
+      - description: Group filter
+        in: query
+        name: group
+        required: true
+        type: string
+      - description: Song filter
+        in: query
+        name: song
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Add New Song
+      tags:
+      - Post
+  /songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete song by ID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Song'
+      summary: Delete song
+      tags:
+      - Delete
+    put:
+      consumes:
+      - application/json
+      description: Update the song details by ID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Song Info
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Required'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Song'
+      summary: Update song
+      tags:
+      - Update
+  /songs/search/filters:
+    get:
+      description: Get a list of songs
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Group filter
+        in: query
+        name: group
+        type: string
+      - description: Song filter
+        in: query
+        name: song
+        type: string
+      - description: Realise date filter
+        in: query
+        name: realiseDate
+        type: string
+      - description: Text filter
+        in: query
+        name: text
+        type: string
+      - description: Link filter
+        in: query
+        name: link
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get songs via filtration
+      tags:
+      - Search
+  /songs/search/verse:
+    get:
+      description: Get a song by a verse
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      - description: Song ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get song via cuplet
+      tags:
+      - Search
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
